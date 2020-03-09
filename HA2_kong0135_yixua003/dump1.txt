@@ -1,0 +1,22 @@
+Reference: https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication 
+Use this website to decode basic authencation:https://www.base64decode.org/
+
+the command line you used to run tcpdump
+curl http://192.168.6.2/1 | sudo tcpdump -A -i ens4 src 192.168.6.2
+
+the captured packet with the password
+17:38:28.080041 IP pwb-cn-01-v4000.ggnet.umn.edu.41076 > pwb-cn-01-v4000.ahc.umn.edu.http: Flags [P.], seq 32:148, ack 1, win 229, options [nop,nop,TS val 122919481 ecr 122924431], length 116: HTTP
+-:--:-E...._@.@............t.P..!.s..-...........
+- --:--.S.9.S..Host: 192.168.6.1
+Connection: close
+:--    76
+Accept-language: en
+Authorization: Basic dHJhdmlzNjptYWl2RGVjZ3VyMzMwNg==
+
+your guess of the plaintext username and password
+Username: travis6
+Password:maivDecgur3306
+
+Command for file1.txt:
+curl -u travis6:maivDecgur3306 http://192.168.6.1/secret/file
+

